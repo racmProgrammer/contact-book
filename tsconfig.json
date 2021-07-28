@@ -10,7 +10,9 @@
     "outDir":"./dist",
     "rootDir":"./src",
     "allowJs":true,
-    "lib":["es6"]
+    "lib":["es6"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
 
   }
 }

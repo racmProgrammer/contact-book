@@ -1,9 +1,11 @@
 import express from "express";
+import { routes } from "routes/routes";
+import "reflect-metadata";
+import "./database/connection";
 
 const app = express();
 
-app.get("/test", (request, response) => {
-  response.send("Hello");
-});
+app.use(express.json());
+app.use(routes);
 
 export { app };
