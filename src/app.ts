@@ -1,9 +1,9 @@
-import express from 'express';
+import express from "express";
 
 const app = express();
 
-app.get("/test",(request, response) =>{
-    response.send("Hello");
+app.get("/test", (request, response) => {
+  response.send("Hello");
 });
 
-export {app};
+export { app };

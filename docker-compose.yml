@@ -4,15 +4,30 @@ services:
   mysqlsrv:
     image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: "contact123"
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "contact_user"
+      MYSQL_PASSWORD: "contactpass"
       MYSQL_DATABASE: "db_contact_book"
     ports:
       - "3306:3306"
     volumes:
-      - C:\Users\RAFAEL\Documents\Dev\contact-book\mysql
+      - .:/usr/app/mysql
     networks:
       - mysql-compose-network
 
 networks: 
   mysql-compose-network:
     driver: bridge
+
+    
+  app:
+    build: .
+    container_name: contact_book
+    ports:
+      - 3333:3333
+    volumes:
+      - .:/usr/app
+    links:
+      - mysqlsrv
+    depends_on: 
+      - mysqlsrv

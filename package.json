@@ -5,11 +5,21 @@
   "author": "racmProgrammer <51178311+racmProgrammer@users.noreply.github.com>",
   "license": "MIT",
   "scripts": {
+    "build": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
     "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules --respawn src/server.ts"
   },
   "devDependencies": {
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.14.8",
+    "@babel/node": "^7.14.7",
+    "@babel/preset-env": "^7.14.8",
+    "@babel/preset-typescript": "^7.14.5",
     "@types/express": "^4.17.13",
     "@types/typescript": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.5",
+    "@typescript-eslint/parser": "^4.28.5",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "eslint": "^7.31.0",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.3.5"
   },
