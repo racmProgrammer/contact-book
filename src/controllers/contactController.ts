@@ -1,6 +1,7 @@
 import { v4 as uuidV4 } from "uuid";
 import { Contact } from "modules/entities/Contact";
-import { Connection, getConnection, getRepository } from "typeorm";
+import { getConnection, getRepository } from "typeorm";
+import { AppError } from "errors/AppError";
 
 async function getContacts(request, response){
     const {name, email} = request.query;
@@ -8,17 +9,18 @@ async function getContacts(request, response){
     try {
         const contactList = await getRepository(Contact)
         .createQueryBuilder("contact")
-        .where("contact.firstName like :name or contact.email like :email", {
+        .where("(contact.firstName like :name or contact.lastName like :name) and contact.email like :email", {
             name: `%${name ? name : ''}%`,
             email:`%${email ? email : ''}%`   
         })
         .getMany();
-        return response.status(200).json(contactList);
-    } catch (error) {
-        return response.status(400).json({
-            message: "Error on returning contact.",
-            detail: error.message()
+
+        const list = contactList.map((contact) =>{
+            return {...contact, telephones:contact.telephones.split('|')}
         });
+        return response.status(200).json(list);
+    }catch (error) {
+        throw new AppError( "Error on returning contact.",500);
     }    
 }
 
@@ -54,6 +56,8 @@ async function createContact(request, response){
                 ...contact,
                 message: "The contact was created."});
         } catch (error) {
+            
+            console.log(error);
             return response.status(400).json({message: "Error on creating contact."});
         }
     }else{
@@ -86,7 +90,7 @@ async function removeContact(request, response){
     }catch (error) {
         return response.status(400).json({
             message: `Error while removing contact.`,
-            detail: error.message() 
+            detail: error.message 
         });
     }
 }
@@ -121,7 +125,7 @@ async function updateContact(request, response){
     } catch (error) {
         return response.status(400).json({
             message: `Error on updating contact.`,
-            detail: error.message()
+            detail: error.message
         });
     }
 }
