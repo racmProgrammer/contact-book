@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  mysqlsrv:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "contact123"
+      MYSQL_DATABASE: "db_contact_book"
+    ports:
+      - "3306:3306"
+    volumes:
+      - C:\Users\RAFAEL\Documents\Dev\contact-book\mysql
+    networks:
+      - mysql-compose-network
+
+networks: 
+  mysql-compose-network:
+    driver: bridge
