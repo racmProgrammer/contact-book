@@ -1,42 +1,129 @@
+import { v4 as uuidV4 } from "uuid";
+import { Contact } from "modules/entities/Contact";
+import { Connection, getConnection, getRepository } from "typeorm";
 
-
-
-function getContacts(request, response){
+async function getContacts(request, response){
     const {name, email} = request.query;
-    console.log(name);
-    console.log(email);
 
-
-    return response.status(200).json({message: "getContacts"});
+    try {
+        const contactList = await getRepository(Contact)
+        .createQueryBuilder("contact")
+        .where("contact.firstName like :name or contact.email like :email", {
+            name: `%${name ? name : ''}%`,
+            email:`%${email ? email : ''}%`   
+        })
+        .getMany();
+        return response.status(200).json(contactList);
+    } catch (error) {
+        return response.status(400).json({
+            message: "Error on returning contact.",
+            detail: error.message()
+        });
+    }    
 }
 
-function createContact(request, response){
+async function createContact(request, response){
     const {firstName, lastName, email, telephones} = request.body;
+   
+    if(telephones){
+        try {
+            const returned =  await getConnection()
+            .createQueryBuilder()
+            .insert()
+            .into(Contact)
+            .values([
+                { 
+                id: uuidV4(),
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                telephones: telephones.join('|') 
+                }
+                
+            ])
+            .execute();
 
-    console.log(firstName);
-    console.log(lastName);
-    console.log(email);
-    console.log(telephones);
-
-
-    return response.status(200).json({message: "createContact"});
+            const contact = await getRepository(Contact)
+            .createQueryBuilder("contact")
+            .where("contact.id = :id", {
+                id: returned.identifiers[0].id
+            })
+            .getOne();
+            
+            return response.status(201).json({
+                ...contact,
+                message: "The contact was created."});
+        } catch (error) {
+            return response.status(400).json({message: "Error on creating contact."});
+        }
+    }else{
+        return response.status(400).json({message: "You must add a telephone number in the form."});
+    }   
 }
 
-
-function removeContact(request, response){
+async function removeContact(request, response){
     const {id} = request.params;
 
-    console.log(id);
-    return response.status(200).json({message: "removido"});
+    try {
+        const contact = await getRepository(Contact)
+            .createQueryBuilder("contact")
+            .where("contact.id = :id", {
+                id: id  
+            })
+            .getOne();
+        if(contact){
+            await getConnection()
+                .createQueryBuilder()
+                .delete()
+                .from(Contact)
+                .where("id = :id", { id: id })
+                .execute();
+        }else{
+            return response.status(404).json({message: `The contact is not found.`});
+        }
+        return response.status(201).json({message: `The contact ${contact.firstName} was removed.`});
+
+    }catch (error) {
+        return response.status(400).json({
+            message: `Error while removing contact.`,
+            detail: error.message() 
+        });
+    }
 }
 
-function updateContact(request, response){
-    const {id} = request.params;
-    const {firstName, lastName, email, telephones} = request.body;
+async function updateContact(request, response){
+    const {id, firstName, lastName, email, telephones} = request.body;
 
-    console.log(id);
-    console.log(request.body);
-    return response.status(200).json({message: "removido"});
+    try {
+        const contact = await getRepository(Contact)
+            .createQueryBuilder("contact")
+            .where("contact.id = :id", {
+                id: id  
+            })
+            .getOne();
+
+        if(contact){
+            await getConnection()
+            .createQueryBuilder()
+            .update(Contact)
+            .set({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                telephones: telephones.join('|')
+            })
+            .where("id = :id", { id: id })
+            .execute();
+        }else{
+            return response.status(404).json({message: `The contact is not found.`});
+        }
+        return response.status(201).json({message: `The contact was updated.`});
+    } catch (error) {
+        return response.status(400).json({
+            message: `Error on updating contact.`,
+            detail: error.message()
+        });
+    }
 }
 
-export {getContacts, createContact, removeContact};
+export {getContacts, createContact, removeContact, updateContact};
