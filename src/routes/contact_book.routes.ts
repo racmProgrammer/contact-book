@@ -1,4 +1,4 @@
-import { getContacts,createContact, removeContact, updateContact } from 'controllers/contactController';
+import { getContacts,createContact, removeContact, updateContact } from './../controllers/contactController';
 import {Router} from 'express';
 
 const contact = Router();
@@ -6,6 +6,6 @@ const contact = Router();
 contact.get("/contact/", getContacts);
 contact.post("/contact/", createContact);
 contact.delete("/contact/:id", removeContact);
-contact.put("/contact", updateContact);
+contact.patch("/contact/:id", updateContact);
 
 export {contact};

@@ -1,8 +1,9 @@
-import express from "express";
-import { routes } from "routes/routes";
+import "express-async-errors";
 import "reflect-metadata";
+import express from "express";
+import errorMiddleware from "./middlewares/errorMiddleware";
+import { routes } from "./routes/routes";
 import "./database/connection";
-import errorMiddleware from "middlewares/errorMiddleware";
 
 const app = express();
 

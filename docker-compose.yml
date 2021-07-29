@@ -1,19 +1,6 @@
 version: '3'
 
 services:
-  
-  app: ## nome do serviço
-    build: . ## localização do dockerfile
-    command: npm start ## comando a executar
-    ports:
-      - "3333:3333" ## redirecionamento de porta quando chegar alguma requisição na porta 3000 chama o container na porta 3000
-    volumes:
-      - .:/usr/app
-    links:
-      - "mysqlsrv"
-    depends_on: 
-      - "mysqlsrv"
-
   mysqlsrv:
     image: mysql:5.7
     environment:
@@ -29,6 +16,17 @@ services:
       - mysql-compose-network
     container_name: mysql-app
 
+  app: ## nome do serviço
+    build: . ## localização do dockerfile
+    command: npm start ## comando a executar
+    ports:
+      - "3333:3333" 
+    volumes:
+      - .:/usr/app
+    links:
+      - "mysqlsrv"
+    depends_on: 
+      - "mysqlsrv"
 networks: 
   mysql-compose-network:
     driver: bridge
